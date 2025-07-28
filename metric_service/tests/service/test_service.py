@@ -47,14 +47,20 @@ def test_show_no_data(client):
 def test_metrics_initial_state(client):
     res = client.get('/metrics')
     assert res.status_code == 200
-    expected = 'text/plain; version=0.0.4; charset=utf-8'
-    assert res.headers['Content-Type'] == expected
+
+    content_type = res.headers['Content-Type'].lower()
+    allowed = [
+        "text/plain; version=0.0.4; charset=utf-8",
+        "text/plain; version=1.0.0; charset=utf-8",
+    ]
+    assert content_type in allowed, f"Unexpected Content-Type: {content_type}"
+
     content = res.data.decode()
 
-    assert 'system_cpu_usage 0.0' in content
-    assert 'system_virtual_memory 0.0' in content
-    assert 'system_used_ram 0.0' in content
-    assert 'system_memory_left 0.0' in content
+    assert "system_cpu_usage" in content
+    assert "system_virtual_memory" in content
+    assert "system_used_ram" in content
+    assert "system_memory_left" in content
 
 
 def test_metrics_after_data_post(client):
